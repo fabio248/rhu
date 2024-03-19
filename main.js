@@ -15,8 +15,10 @@ async function readCsvFile() {
     const id = new Stats()
     const valor1= new Stats()
     const valor2 = new Stats()
+    const totalStats = new Stats()
+    const total = []
 
-    await fs.createReadStream('./datos.csv')
+    fs.createReadStream('./datos.csv')
         .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
         .on('data', function(csvrow) {
             id.push(csvrow.id === '' ? 0 : +csvrow.id)
@@ -51,25 +53,19 @@ async function readCsvFile() {
 \t\ty el objetivo del análisis. En este caso se opta por reemplazar los valores nulos por 0, 
 \t\tya que no se cuenta con información suficiente para imputar un valor que represente adecuadamente el dato faltante.`)
         })
-        /*
-        * - Crea una nueva columna llamada "total" que sea la suma de las columnas "valor1" y "valor2".  - Calcula el promedio de la columna "total".
-        * */
-
-            const total = []
-            const totalStats = new Stats()
-            await fs.createReadStream('./datos.csv')
-                .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
-                .on('data', function(csvrow) {
-                    const totalAmount = (csvrow.valor1 === '' ? 0 : +csvrow.valor1) + (csvrow.valor2 === '' ? 0 : +csvrow.valor2)
-                    totalStats.push(totalAmount)
-                    total.push({ ...csvrow, total: totalAmount })
-                }).on('end', () => {
-                    console.log("\t2.4 Creación de Nuevas Variables:")
-                    console.log("\t\t2.4.1. Creación de la columna total: ")
-                    console.log(total)
-                    console.log("\t\t2.4.2. Promedio de la columna total: ", totalStats.amean())
-
-                })
+        fs.createReadStream('./datos.csv')
+            .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
+            .on('data', function(csvrow) {
+                const totalAmount = (csvrow.valor1 === '' ? 0 : +csvrow.valor1) + (csvrow.valor2 === '' ? 0 : +csvrow.valor2)
+                totalStats.push(totalAmount)
+                total.push({ ...csvrow, total: totalAmount })
+            }).on('end', () => {
+                console.log("\t2.4 Creación de Nuevas Variables:")
+                console.log("\t\t2.4.1. Creación de la columna total: ")
+                console.log(total)
+                console.log("\t\t2.4.2. Promedio de la columna total: ", totalStats.amean())
+            console.log('\t3. Análisis Adicional:')
+            })
 }
 
 main();
