@@ -18,7 +18,7 @@ async function readCsvFile() {
     const totalStats = new Stats()
     const total = []
 
-    fs.createReadStream('./datos.csv')
+    await fs.createReadStream('./datos.csv')
         .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
         .on('data', function(csvrow) {
             id.push(csvrow.id === '' ? 0 : +csvrow.id)
@@ -53,19 +53,43 @@ async function readCsvFile() {
 \t\ty el objetivo del análisis. En este caso se opta por reemplazar los valores nulos por 0, 
 \t\tya que no se cuenta con información suficiente para imputar un valor que represente adecuadamente el dato faltante.`)
         })
-        fs.createReadStream('./datos.csv')
-            .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
-            .on('data', function(csvrow) {
-                const totalAmount = (csvrow.valor1 === '' ? 0 : +csvrow.valor1) + (csvrow.valor2 === '' ? 0 : +csvrow.valor2)
-                totalStats.push(totalAmount)
-                total.push({ ...csvrow, total: totalAmount })
-            }).on('end', () => {
-                console.log("\t2.4 Creación de Nuevas Variables:")
-                console.log("\t\t2.4.1. Creación de la columna total: ")
-                console.log(total)
-                console.log("\t\t2.4.2. Promedio de la columna total: ", totalStats.amean())
+    await fs.createReadStream('./datos.csv')
+        .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
+        .on('data', function(csvrow) {
+            const totalAmount = (csvrow.valor1 === '' ? 0 : +csvrow.valor1) + (csvrow.valor2 === '' ? 0 : +csvrow.valor2)
+            totalStats.push(totalAmount)
+            total.push({ ...csvrow, total: totalAmount })
+        }).on('end', () => {
+            console.log("\t2.4 Creación de Nuevas Variables:")
+            console.log("\t\t2.4.1. Creación de la columna total: ")
+            console.log(total)
+            console.log("\t\t2.4.2. Promedio de la columna total: ", totalStats.amean())
             console.log('\t3. Análisis Adicional:')
-            })
+            console.log("\t\t3.1 Correlación entre valor1 y valor2: ", calculateCorrelation(total, 'valor1', 'valor2'));
+            console.log("\t\t3.2 Correlación entre valor1 y total: ", calculateCorrelation(total, 'valor1', 'total'));
+            console.log("\t\t3.3 Correlación entre valor2 y total: ", calculateCorrelation(total, 'valor2', 'total'));
+        })
 }
+
+function calculateCorrelation(data, key1, key2) {
+    const stats1 = new Stats();
+    const stats2 = new Stats();
+
+    data.forEach(item => {
+        stats1.push(item[key1] === '' ? 0 : +item[key1]);
+        stats2.push(item[key2] === '' ? 0 : +item[key2]);
+    });
+
+    const mean1 = stats1.amean();
+    const mean2 = stats2.amean();
+
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+        sum += ((data[i][key1] === '' ? 0 : +data[i][key1]) - mean1) * ((data[i][key2] === '' ? 0 : +data[i][key2]) - mean2);
+    }
+
+    return sum / ((data.length - 1) * stats1.stddev() * stats2.stddev());
+}
+
 
 main();
