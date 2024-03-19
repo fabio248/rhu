@@ -56,14 +56,19 @@ async function readCsvFile() {
         * */
 
             const total = []
+            const totalStats = new Stats()
             await fs.createReadStream('./datos.csv')
                 .pipe(parse({ delimiter: ',', columns: true, ltrim: true }))
                 .on('data', function(csvrow) {
-                    total.push({ ...csvrow, total: (csvrow.valor1 === '' ? 0 : +csvrow.valor1) + (csvrow.valor2 === '' ? 0 : +csvrow.valor2) })
+                    const totalAmount = (csvrow.valor1 === '' ? 0 : +csvrow.valor1) + (csvrow.valor2 === '' ? 0 : +csvrow.valor2)
+                    totalStats.push(totalAmount)
+                    total.push({ ...csvrow, total: totalAmount })
                 }).on('end', () => {
                     console.log("\t2.4 Creación de Nuevas Variables:")
                     console.log("\t\t2.4.1. Creación de la columna total: ")
                     console.log(total)
+                    console.log("\t\t2.4.2. Promedio de la columna total: ", totalStats.amean())
+
                 })
 }
 
