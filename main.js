@@ -64,10 +64,10 @@ async function readCsvFile() {
             console.log("\t\t2.4.1. Creación de la columna total: ")
             console.log(total)
             console.log("\t\t2.4.2. Promedio de la columna total: ", totalStats.amean())
-            console.log('\t3. Análisis Adicional:')
-            console.log("\t\t3.1 Correlación entre valor1 y valor2: ", calculateCorrelation(total, 'valor1', 'valor2'));
-            console.log("\t\t3.2 Correlación entre valor1 y total: ", calculateCorrelation(total, 'valor1', 'total'));
-            console.log("\t\t3.3 Correlación entre valor2 y total: ", calculateCorrelation(total, 'valor2', 'total'));
+            console.log('3. Análisis Adicional:')
+            console.log("\t3.1 Correlación entre valor1 y valor2: ", calculateCorrelation(total, 'valor1', 'valor2'));
+            console.log("\t3.2 Correlación entre valor1 y total: ", calculateCorrelation(total, 'valor1', 'total'));
+            console.log("\t3.3 Correlación entre valor2 y total: ", calculateCorrelation(total, 'valor2', 'total'));
         })
 }
 
